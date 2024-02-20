@@ -16,4 +16,7 @@ def test_labeled_two_cycles_graph_to_dot():
     with tempfile.NamedTemporaryFile() as tmp:
         path = tmp.name
     project.task01.labeled_two_cycles_graph_to_dot(10, 8, None, path)
-    assert filecmp.cmp(f"{dir_path}/test_task01_data/10_8_graph.dot", path)
+
+    assert filecmp.cmp(
+        f"{dir_path}/test_task01_data/10_8_graph_LF.dot", path
+    ) or filecmp.cmp(f"{dir_path}/test_task01_data/10_8_graph_CRLF.dot", path)
