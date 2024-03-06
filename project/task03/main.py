@@ -1,29 +1,24 @@
 from pyformlang.finite_automaton import *
-
-from scipy.sparse import bsr_matrix
-
+from scipy.sparse import *
 from typing import *
 
 
 class FiniteAutomaton:
     def __init__(self, fa):
-        if isinstance(fa, DeterministicFiniteAutomaton):
-            pass
-        elif isinstance(fa, NondeterministicFiniteAutomaton):
-            fa = fa.to_deterministic()
-        else:
-            return
+        self.start_states = fa.start_states
+        self.final_states = fa.final_states
+        self.matrix = {}
+        self.state_to_i = {s: i for i, s in enumerate(fa.states)}
 
-        n = fa.states()
-        # self.states = list(product(fa.states, fa.symbols))
+        states = fa.to_dict()
+        n = len(fa.states)
 
-        self.start_states = fa.start_states()
-        self.final_states = fa.final_states()
-        self.matrix = bsr_matrix((n, n), dtype=str)
-
-        for st, d in fa.to_dict.items():
-            for sy, fi in d.items():
-                self.matrix[st, fi] += sy
+        for l in fa.symbols:
+            self.matrix[l] = dok_matrix((n, n), dtype=bool)
+            for st, ls in states.items():
+                if l in ls:
+                    for fi in ls[l]:
+                        self.matrix[l][self.state_to_i[st], self.state_to_i[fi]] = True
 
     def accepts(self, word: Iterable[Symbol]) -> bool:
         pass
