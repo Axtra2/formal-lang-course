@@ -1,6 +1,9 @@
 from pyformlang.finite_automaton import *
 from scipy.sparse import *
+from networkx import *
 from typing import *
+
+from project.task02 import regex_to_dfa, graph_to_nfa
 
 from itertools import product
 
@@ -11,6 +14,8 @@ class FiniteAutomaton:
             return
 
         state_to_i = {s: i for i, s in enumerate(fa.states)}
+
+        self.i_to_state = list(fa.states)
 
         self.start_states = {state_to_i[st] for st in fa.start_states}
         self.final_states = {state_to_i[fi] for fi in fa.final_states}
@@ -80,3 +85,30 @@ def intersect_automata(
         fa.final_states.add(i * (n_states2) + j)
 
     return fa
+
+
+def paths_ends(
+    graph: MultiDiGraph, start_nodes: set[int], final_nodes: set[int], regex: str
+) -> list[tuple[dict, dict]]:
+    fa1 = FiniteAutomaton(graph_to_nfa(graph, start_nodes, final_nodes))
+    fa2 = FiniteAutomaton(regex_to_dfa(regex))
+    fa = intersect_automata(fa1, fa2)
+
+    if len(fa.matrix) == 0:
+        return []
+
+    m = sum(fa.matrix.values())
+    for _ in range(m.shape[0]):
+        m += m @ m
+
+    n_states2 = fa2.matrix.values().__iter__().__next__().shape[0]
+
+    def to_node(i):
+        return graph.nodes[fa1.i_to_state[i // n_states2]]
+
+    res = []
+    for st, fi in product(fa.start_states, fa.final_states):
+        if m[st, fi] != 0:
+            res.append((to_node(st), to_node(fi)))
+
+    return res
