@@ -89,7 +89,7 @@ def intersect_automata(
 
 def paths_ends(
     graph: MultiDiGraph, start_nodes: set[int], final_nodes: set[int], regex: str
-) -> list[tuple[dict, dict]]:
+) -> list[tuple[int, int]]:
     fa1 = FiniteAutomaton(graph_to_nfa(graph, start_nodes, final_nodes))
     fa2 = FiniteAutomaton(regex_to_dfa(regex))
     fa = intersect_automata(fa1, fa2)
@@ -103,12 +103,12 @@ def paths_ends(
 
     n_states2 = fa2.matrix.values().__iter__().__next__().shape[0]
 
-    def to_node(i):
-        return graph.nodes[fa1.i_to_state[i // n_states2]]
+    def extract_fa1_node_idx(i):
+        return fa1.i_to_state[i // n_states2].value
 
     res = []
     for st, fi in product(fa.start_states, fa.final_states):
         if m[st, fi] != 0:
-            res.append((to_node(st), to_node(fi)))
+            res.append((extract_fa1_node_idx(st), extract_fa1_node_idx(fi)))
 
     return res
