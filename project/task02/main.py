@@ -36,4 +36,4 @@ def graph_to_nfa(
     for s, t, l in graph.edges(data="label"):
         e_nfa.add_transition(s, l, t)
 
-    return e_nfa.remove_epsilon_transitions().minimize()
+    return e_nfa.remove_epsilon_transitions()

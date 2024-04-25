@@ -94,21 +94,25 @@ def paths_ends(
     fa2 = FiniteAutomaton(regex_to_dfa(regex))
     fa = intersect_automata(fa1, fa2)
 
-    if len(fa.matrix) == 0:
-        return []
-
-    m = sum(fa.matrix.values())
-    for _ in range(m.shape[0]):
-        m += m @ m
-
     n_states2 = fa2.matrix.values().__iter__().__next__().shape[0]
 
     def extract_fa1_node_idx(i):
         return fa1.i_to_state[i // n_states2].value
 
-    res = []
+    res = set()
+    for st in fa.start_states & fa.final_states:
+        n = extract_fa1_node_idx(st)
+        res.add((n, n))
+
+    if len(fa.matrix) == 0:
+        return res
+
+    m = sum(fa.matrix.values())
+    for _ in range(m.shape[0]):
+        m += m @ m
+
     for st, fi in product(fa.start_states, fa.final_states):
         if m[st, fi] != 0:
-            res.append((extract_fa1_node_idx(st), extract_fa1_node_idx(fi)))
+            res.add((extract_fa1_node_idx(st), extract_fa1_node_idx(fi)))
 
-    return res
+    return list(res)
