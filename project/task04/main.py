@@ -42,6 +42,11 @@ def reachability_with_constraints(
         for i in range(h):
             front[i, st + m] = True
 
+        if st in fa.final_states:
+            for i in constraints_fa.start_states:
+                if i in constraints_fa.final_states:
+                    res[fa.i_to_state[st]].add(fa.i_to_state[st])
+
         for _ in range(m * n):
             new_front = dok_matrix((h, w), dtype=bool)
             for l in ls:
