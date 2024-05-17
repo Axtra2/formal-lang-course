@@ -12,11 +12,17 @@ from scipy.sparse import *
 
 
 def cfpq_with_tensor(
-    rsm: RecursiveAutomaton,
+    cfg_or_rsm: CFG | RecursiveAutomaton,
     graph: nx.DiGraph,
     start_nodes: set[int] = None,
     final_nodes: set[int] = None,
 ) -> set[tuple[int, int]]:
+
+    rsm = (
+        cfg_or_rsm
+        if isinstance(cfg_or_rsm, RecursiveAutomaton)
+        else cfg_to_rsm(cfg_or_rsm)
+    )
 
     start_nodes = graph.nodes if start_nodes is None else start_nodes
     final_nodes = graph.nodes if final_nodes is None else final_nodes
