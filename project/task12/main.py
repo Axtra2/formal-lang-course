@@ -68,7 +68,6 @@ class Typer(ggggVisitor):
                 raise Exception("Attemt to add not to graph")
         else:
             raise Exception("Use of undeclared variable " + var)
-            # self.context[var] = "graph"
         self.visitExpr(ctx.expr())
         return self.visitChildren(ctx)
 
@@ -100,9 +99,6 @@ class Typer(ggggVisitor):
         elem_types = [self.visitExpr(expr) for expr in ctx.expr()]
         if all(t == "int" for t in elem_types):
             return "set<int>"
-            # return f"set<int, {len(elem_types)}>"
-        # if all(t == "set<int, 2>" for t in elem_types):
-        #     return f"set<int*int, {len(elem_types)}>"
         raise Exception("Bad set elements")
 
     # Visit a parse tree produced by ggggParser#edge_expr.
@@ -118,8 +114,6 @@ class Typer(ggggVisitor):
             if var in self.context:
                 return self.context[var]
             return "RSM"
-        # elif ctx.range():
-        #     return self.visitRegexp(ctx.regexp())
         elif len(ctx.regexp()) == 1:
             return self.visitRegexp(ctx.regexp()[0])
 
